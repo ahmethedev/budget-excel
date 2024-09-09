@@ -13,7 +13,7 @@ body {
 }
 
 .App {
-  max-width: 1600px;
+  max-width: 1800px;
   margin: 20px auto;
   padding: 20px;
   background-color: white;
@@ -24,8 +24,8 @@ body {
 /* Header styling */
 h1, h2, h3 {
   color: #001f3f;
-  text-align: center; /* Center-align headers */
-  margin-bottom: 20px; /* Add spacing below headers */
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 /* Button styling */
@@ -34,10 +34,10 @@ button {
   color: white;
   border: none;
   padding: 10px 15px;
-  margin: 10px 5px; /* Add margin for better spacing */
+  margin: 10px 5px;
   cursor: pointer;
   transition: background-color 0.3s;
-  border-radius: 4px; /* Rounded corners for buttons */
+  border-radius: 4px;
 }
 
 button:hover {
@@ -47,31 +47,31 @@ button:hover {
 /* Input fields styling */
 input[type="number"], input[type="text"], select {
   padding: 8px;
-  margin: 10px 5px; /* Adjusted margin for consistent spacing */
+  margin: 10px 5px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  width: 100%; /* Responsive width adjustment */
-  max-width: 300px; /* Max width for input fields */
-  box-sizing: border-box; /* Ensures padding is included in width */
+  width: 100%;
+  max-width: 300px;
+  box-sizing: border-box;
 }
 
 /* Container for centering the table */
 .table-container {
-  display: flex; /* Flexbox for centering */
-  justify-content: center; /* Horizontally center */
-  align-items: center; /* Vertically center */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  margin-top: 20px; /* Margin for spacing above table */
+  margin-top: 20px;
 }
 
 /* Table styling */
 .table-container table {
-  border-collapse: collapse; /* Collapse table borders */
-  margin: 0 auto; /* Center table within its container */
-  width: 90%; /* Adjust width as needed */
-  max-width: 100%; /* Prevent overflow */
-  text-align: left; /* Align text to the left */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Add shadow for aesthetics */
+  border-collapse: collapse;
+  margin: 0 auto;
+  width: 90%;
+  max-width: 100%;
+  text-align: left;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Styling for table headers and cells */
@@ -87,7 +87,7 @@ th {
 }
 
 tr:nth-child(even) {
-  background-color: #f2f2f2; /* Alternate row background */
+  background-color: #f2f2f2;
 }
 
 /* Button styling inside the table */
@@ -96,7 +96,7 @@ tr:nth-child(even) {
   border: none;
   cursor: pointer;
   color: white;
-  font-size: 14px; /* Adjusted font size for better consistency */
+  font-size: 14px;
   margin-left: 5px;
 }
 
@@ -112,7 +112,78 @@ tr:nth-child(even) {
 }
 
 .chart-container {
-  width: 100%; /* Or specific width like 300px */
-  max-width: 600px; /* Adjust the max-width as needed */
+  width: 100%;
+  max-width: 600px;
   margin: auto;
+}
+
+/* src/components/DataTable.css */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+input[type="number"] {
+  width: 150px;
+}
+
+button {
+  margin-right: 10px;
+}
+
+.distributed-total {
+  font-weight: bold;
+}
+
+.distributed-total.exceed {
+  color: red;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+
+  h1, h2, h3 {
+    font-size: 1.5rem;
+  }
+
+  .table-container table {
+    width: 100%;
+  }
+
+  th, td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .chart-container {
+    max-width: 100%;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  input[type="number"], input[type="text"], select {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  h1, h2, h3 {
+    font-size: 1.2rem;
+  }
+
+  th, td {
+    font-size: 0.8rem;
+  }
+
+  .sort-button {
+    font-size: 12px;
+  }
 }

@@ -1,13 +1,18 @@
-// src/components/ChartVisualization.js
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
-import dragDataPlugin from 'chartjs-plugin-dragdata';
-ChartJS.register(...registerables, dragDataPlugin);
+
+ChartJS.register(...registerables);
 
 function ChartVisualization({ data, setData, budget }) {
+  const [popupData, setPopupData] = useState({ open: false, label: '', currentValue: 0 });
+  const chartRefs = {
+    project: useRef(null),
+    firm: useRef(null),
+    payment: useRef(null),
+  };
+
   const prepareChartData = () => {
-    // Proje Adı ve Firma Adı'na göre veri hazırlamak
     const projectData = data.reduce((acc, item) => {
       acc[item['Proje Adı']] = (acc[item['Proje Adı']] || 0) + item['Bu ay ödenecek tutar'];
       return acc;
@@ -18,7 +23,6 @@ function ChartVisualization({ data, setData, budget }) {
       return acc;
     }, {});
 
-    // Ödeme Takip Numarasına göre veri hazırlamak
     const paymentTrackingData = data.reduce((acc, item) => {
       acc[item['Ödeme Takip No']] = (acc[item['Ödeme Takip No']] || 0) + item['Bu ay ödenecek tutar'];
       return acc;
@@ -37,7 +41,6 @@ function ChartVisualization({ data, setData, budget }) {
             'rgba(75, 192, 192, 0.6)',
             'rgba(153, 102, 255, 0.6)',
           ],
-          dragData: true,
         }],
       },
       firmData: {
@@ -52,7 +55,6 @@ function ChartVisualization({ data, setData, budget }) {
             'rgba(75, 192, 192, 0.6)',
             'rgba(153, 102, 255, 0.6)',
           ],
-          dragData: true,
         }],
       },
       paymentTrackingData: {
@@ -67,7 +69,6 @@ function ChartVisualization({ data, setData, budget }) {
             'rgba(75, 192, 192, 0.6)',
             'rgba(153, 102, 255, 0.6)',
           ],
-          dragData: true,
         }],
       },
     };
@@ -77,81 +78,48 @@ function ChartVisualization({ data, setData, budget }) {
 
   const updateDataFromChart = (label, newValue) => {
     const newData = [...data];
-    let totalCurrent = newData.reduce((sum, row) => sum + row['Bu ay ödenecek tutar'], 0);
-
-    if (totalCurrent <= budget) {
-      const newDataAdjusted = newData.map(item => {
-        if (item['Proje Adı'] === label || item['Firma Adı'] === label || item['Ödeme Takip No'] === label) {
-          return { ...item, 'Bu ay ödenecek tutar': newValue };
-        }
-        return item;
-      });
-
-      // Toplam bütçeyi aşmamak için diğer değerleri güncelle
-      const totalNewValue = newDataAdjusted.reduce((sum, row) => sum + row['Bu ay ödenecek tutar'], 0);
-      if (totalNewValue > budget) {
-        const diff = totalNewValue - budget;
-        newDataAdjusted.forEach(item => {
-          if (item['Proje Adı'] !== label && item['Firma Adı'] !== label && item['Ödeme Takip No'] !== label) {
-            item['Bu ay ödenecek tutar'] = Math.max(0, item['Bu ay ödenecek tutar'] - diff / (newDataAdjusted.length - 1));
-          }
-        });
+    const updatedData = newData.map(item => {
+      if (item['Proje Adı'] === label || item['Firma Adı'] === label || item['Ödeme Takip No'] === label) {
+        return { ...item, 'Bu ay ödenecek tutar': newValue };
       }
+      return item;
+    });
+    setData(updatedData);
+  };
 
-      setData(newDataAdjusted);
+  const handleDoubleClick = (label, currentValue) => {
+    const newValue = parseFloat(prompt(`Yeni değer girin: (Mevcut: ${currentValue})`, currentValue));
+    if (!isNaN(newValue) && newValue >= 0) {
+      updateDataFromChart(label, newValue);
     }
   };
 
-  const handleDragEnd = (e, datasetIndex, index, value) => {
-    const label = projectData.labels[index] || firmData.labels[index] || paymentTrackingData.labels[index];
-    updateDataFromChart(label, Math.max(0, value));
+  const handleChartClick = (chartRef, event) => {
+    const chart = chartRef.current;
+    if (chart) {
+      const elements = chart.getElementsAtEventForMode(event.nativeEvent, 'nearest', { intersect: true }, false);
+      if (elements.length > 0) {
+        const index = elements[0].index;
+        const label = chart.data.labels[index];
+        const currentValue = chart.data.datasets[0].data[index];
+        handleDoubleClick(label, currentValue);
+      }
+    }
   };
 
   return (
     <div>
       <h2>Projelere Göre Bu Ay Ödenecek Tutar</h2>
-      <div className="chart-container">
-        <Bar 
-          data={projectData} 
-          options={{
-            plugins: {
-              dragData: {
-                round: 1,
-                onDragEnd: handleDragEnd,
-              }
-            }
-          }} 
-        />
+      <div className="chart-container" onDoubleClick={(e) => handleChartClick(chartRefs.project, e)}>
+        <Bar ref={chartRefs.project} data={projectData} />
       </div>
       <h2>Firmalara Göre Bu Ay Ödenecek Tutar</h2>
-      <div className="chart-container">
-        <Pie 
-          data={firmData}
-          options={{
-            plugins: {
-              dragData: {
-                round: 1,
-                dragX: false,
-                dragY: true,
-                onDragEnd: handleDragEnd,
-              }
-            }
-          }}
-        />
+      <div className="chart-container" onDoubleClick={(e) => handleChartClick(chartRefs.firm, e)}>
+        <Pie ref={chartRefs.firm} data={firmData} />
       </div>
       <h2>Ödeme Takip Numarasına Göre Bu Ay Ödenecek Tutar</h2>
-      <div className="chart-container">
-        <Bar
-          data={paymentTrackingData}
-          options={{
-            plugins: {
-              dragData: {
-                round: 1,
-                onDragEnd: handleDragEnd,
-              }
-            }
-          }}
-        />
+      <div className="chart-container" onDoubleClick={(e) => handleChartClick(chartRefs.payment, e)}>
+        <Bar ref={chartRefs.payment} data={paymentTrackingData} />
       </div>
     </div>
   );

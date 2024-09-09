@@ -17,9 +17,6 @@ function App() {
     setOriginalData(JSON.parse(JSON.stringify(importedData)));
   };
 
-  const handleBudgetChange = (newBudget) => {
-    setBudget(newBudget);
-  };
 
   const handleScenarioSave = (scenario) => {
     setScenarios([...scenarios, scenario]);
@@ -51,13 +48,7 @@ function App() {
                 <ExcelImport onDataImport={handleDataImport} />
                 {data && (
                   <>
-                  
-                    <input
-                      type="number"
-                      value={budget}
-                      onChange={(e) => handleBudgetChange(Number(e.target.value))}
-                      placeholder="Toplam bütçeyi girin"
-                    />
+
                     <div className="table-container">
                     <DataTable 
                       data={data} 
