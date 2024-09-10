@@ -1,10 +1,13 @@
+
+
+// ChartVisualization.js
 import React, { useState, useRef } from 'react';
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
 
 ChartJS.register(...registerables);
 
-function ChartVisualization({ data, setData, budget }) {
+function ChartVisualization({ data, setData, budget, setDistributedTotal }) {
   const [popupData, setPopupData] = useState({ open: false, label: '', currentValue: 0 });
   const chartRefs = {
     project: useRef(null),
@@ -85,6 +88,13 @@ function ChartVisualization({ data, setData, budget }) {
       return item;
     });
     setData(updatedData);
+    
+    // Update distributed total
+    const newDistributedTotal = updatedData.reduce(
+      (sum, row) => sum + row['Bu ay ödenecek tutar'],
+      0
+    );
+    setDistributedTotal(newDistributedTotal);
   };
 
   const handleDoubleClick = (label, currentValue) => {
